@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="container" id="loginSection">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="login()">Login</button>
+</div>
+
+<div class="container hidden" id="formSection">
+    <h2>Student Registration Form</h2>
+
+    <input type="text" id="firstName" placeholder="First Name">
+    <input type="text" id="lastName" placeholder="Last Name">
+    <input type="text" id="mobile" placeholder="Mobile Number">
+    <input type="number" id="age" placeholder="Age">
+
+    <select id="gender">
+        <option value="">Select Gender</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+    </select>
+
+    <input type="email" id="email" placeholder="Email ID">
+    <input type="file" id="photo">
+    <input type="text" id="education" placeholder="Education Qualification">
+    <input type="text" id="city" placeholder="City">
+    <input type="text" id="district" placeholder="District">
+    <input type="text" id="state" placeholder="State">
+    <input type="text" id="country" placeholder="Country">
+    <input type="text" id="pincode" placeholder="Pin Code">
+ <div>
+    <button onclick="saveStudent()">Save</button>
+    <button onclick="resetForm()">Reset</button>
+    <button onclick="submitForm()">Submit</button>
+    <button onclick="logout()">Logout</button>
+ </div>
+  
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Email</th>
+                <th>Photo</th>
+                <th>Education</th>
+                <th>City</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+let editIndex = -1;
+
+const presetUser = "kamesh";
+const presetPass = "989898";
+
+function login() {
+    let user = document.getElementById("loginUser").value;
+    let pass = document.getElementById("loginPass").value;
+
+    if(user === presetUser && pass === presetPass){
+        alert("Login Successful!");
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("formSection").classList.remove("hidden");
+        loadStudents();
+    } else {
+        alert("Invalid Credentials!");
+    }
+}
+
+
+function saveStudent() {
+    let student = getFormData();
+    storeStudent(student);
+}
+
+function getFormData() {
+    let student = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        mobile: mobile.value,
+        age: age.value,
+        gender: gender.value,
+        email: email.value,
+        education: education.value,
+        city: city.value,
+        district: district.value,
+        state: state.value,
+        country: country.value,
+        pincode: pincode.value,
+        photo: ""
+    };
+
+    let file = document.getElementById("photo").files[0];
+    if(file){
+        let reader = new FileReader();
+        reader.onload = function(){
+            student.photo = reader.result;
+            storeStudent(student);
+        };
+        reader.readAsDataURL(file);
+    }
+    return student;
+}
+
+
+function storeStudent(student) {
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    if(editIndex === -1){
+        students.push(student);
+    } else {
+        students[editIndex] = student;
+        editIndex = -1;
+    }
+    localStorage.setItem("students", JSON.stringify(students));
+    loadStudents();
+    resetForm();
+}
+
+
+function loadStudents() {
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    let table = document.querySelector("#studentTable tbody");
+    table.innerHTML = "";
+
+    students.forEach((s,index)=>{
+        table.innerHTML += `
+            <tr>
+                <td>${s.firstName} ${s.lastName}</td>
+                <td>${s.mobile}</td>
+                <td>${s.age}</td>
+                <td>${s.gender}</td>
+                <td>${s.email}</td>
+                <td>${s.photo ? '<img src="'+s.photo+'">' : ''}</td>
+                <td>${s.education}</td>
+                <td>${s.city}</td>
+                <td>
+                    <button onclick="editStudent(${index})">Edit</button>
+                    <button onclick="deleteStudent(${index})">Delete</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+
+function editStudent(index){
+    let students = JSON.parse(localStorage.getItem("students"));
+    let s = students[index];
+
+    firstName.value = s.firstName;
+    lastName.value = s.lastName;
+    mobile.value = s.mobile;
+    age.value = s.age;
+    gender.value = s.gender;
+    email.value = s.email;
+    education.value = s.education;
+    city.value = s.city;
+    district.value = s.district;
+    state.value = s.state;
+    country.value = s.country;
+    pincode.value = s.pincode;
+ editIndex = index;
+}
+
+
+function deleteStudent(index){
+    let students = JSON.parse(localStorage.getItem("students"));
+    students.splice(index,1);
+    localStorage.setItem("students",JSON.stringify(students));
+    loadStudents();
+}
+
+
+function resetForm(){
+    document.querySelectorAll("#formSection input, #formSection select").forEach(input => input.value="");
+    document.querySelectorAll("#formSection input, #formSection select").forEach(input => input.style.border="");
+}
+
+
+function submitForm(){
+    const requiredFields = [
+        "firstName","lastName","mobile","age","gender",
+        "email","education","city","district","state","country","pincode"
+    ];
+
+    let allFilled = true;
+
+    requiredFields.forEach(id=>{
+        const field = document.getElementById(id);
+        if(!field.value){
+            field.style.border = "2px solid red";
+            allFilled = false;
+        } else {
+            field.style.border = "";
+        }
+    });
+
+    if(allFilled){
+        let student = getFormData();
+        storeStudent(student);
+        alert("Submitted Successfully!");
+    } else {
+        alert("Please fill all required fields!");
+    }
+}
+
+function logout(){
+    
+    document.getElementById("formSection").classList.add("hidden");
+    document.getElementById("loginSection").classList.remove("hidden");
+
+    document.getElementById("loginUser").value = "";
+    document.getElementById("loginPass").value = "";
+
+    resetForm();
+    alert("Logged out successfully!");
+}
+</script>
+
+</body>
+</html>
