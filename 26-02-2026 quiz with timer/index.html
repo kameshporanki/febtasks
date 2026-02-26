@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Quiz</title>
+    <link rel="stylesheet" href="style.css"/>
+    
+</head>
+<body>
+
+    
+    <div class="start-container">
+        <h1>Web Development Quiz</h1>
+        
+        <button id="start-btn">Start Quiz</button>
+    </div>
+
+   
+    <div class="quiz-container hide" id="quiz">
+        <h1>Web Development Quiz</h1>
+        
+        <div id="timer">Time Left: 60</div>
+
+        <div id="question-container">
+            <h2 id="question">Question text</h2>
+            <div id="answer-buttons" class="btn-container"></div>
+        </div>
+
+        <button id="next-btn" class="hide">Next</button>
+
+        <div id="result" class="hide"></div>
+    </div>
+
+    <script>
+        
+        const startButton = document.getElementById("start-btn");
+        const quizContainer = document.getElementById("quiz");
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+        const resultElement = document.getElementById("result");
+        const timerElement = document.getElementById("timer");
+
+        
+        const questions = [
+            {
+                question: "What does HTML stand for?",
+                answers: [
+                    { text: "Hyper Text Markup Language", correct: true },
+                    { text: "Home Tool Markup Language", correct: false },
+                    { text: "Hyperlinks and Text Markup Language", correct: false },
+                    { text: "Hyper Tool Multi Language", correct: false }
+                ]
+            },
+
+            {
+                question: "Which language is used for styling web pages?",
+                answers: [
+                    { text: "HTML", correct: false },
+                    { text: "JQuery", correct: false },
+                    { text: "CSS", correct: true },
+                    { text: "XML", correct: false }
+                ]
+            },
+            
+            {
+                question: "Which is used to make website interactive?",
+                answers: [
+                    { text: "CSS", correct: false },
+                    { text: "JavaScript", correct: true },
+                    { text: "HTML", correct: false },
+                    { text: "Bootstrap", correct: false }
+                ]
+            },
+
+            {
+                question: "Which HTML element is used for the largest heading?",
+                answers: [
+                    { text: "<h1>", correct: true },
+                    { text: "<head>", correct: false },
+                    { text: "<heading>", correct: false },
+                    { text: "<h6>", correct: false }
+                ]
+            },
+
+            {
+                question: "What does CSS stand for?",
+                answers: [
+                    { text: "Cascading Style Sheets", correct: true },
+                    { text: "Computer Style Sheets", correct: false },
+                    { text: "Creative Style System", correct: false },
+                    { text: "Colorful Style Syntax", correct: false }
+                ]
+            },
+
+            {
+                question: "Inside which HTML element do we put JavaScript?",
+                answers: [
+                    { text: "<js>", correct: false },
+                    { text: "<script>", correct: true },
+                    { text: "<javascript>", correct: false },
+                    { text: "<scripting>", correct: false }
+                ]
+            },
+
+            {
+                question: "Which property is used to change the background color in CSS?",
+                answers: [
+                    { text: "color", correct: false },
+                    { text: "background-color", correct: true },
+                    { text: "bgcolor", correct: false },
+                    { text: "background", correct: false }
+                ]
+            },
+
+            {
+                question: "Which HTML attribute is used to define inline styles?",
+                answers: [
+                    { text: "styles", correct: false },
+                    { text: "style", correct: true },
+                    { text: "class", correct: false },
+                    { text: "font", correct: false }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let timer;
+
+        
+        startButton.addEventListener("click", () => {
+     startButton.parentElement.style.display = "none"; 
+     quizContainer.classList.remove("hide"); 
+     startQuiz(); 
+});
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 60;
+            resultElement.classList.add("hide");
+            nextButton.classList.add("hide");
+            startTimer();
+            showQuestion();
+        }
+
+        
+        function startTimer() {
+            timerElement.innerText = "Time Left: " + timeLeft;
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.innerText = "Time Left: " + timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+      
+        function showQuestion() {
+            resetState();
+            let currentQuestion = questions[currentQuestionIndex];
+            questionElement.innerText = currentQuestion.question;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.innerText = answer.text;
+                button.addEventListener("click", () => selectAnswer(answer, button));
+                answerButtons.appendChild(button);
+            });
+        }
+
+        
+        function resetState() {
+            nextButton.classList.add("hide");
+            answerButtons.innerHTML = "";
+        }
+
+        
+        function selectAnswer(answer, button) {
+            if (answer.correct) {
+                score++;
+                button.style.backgroundColor = "green";
+            } else {
+                button.style.backgroundColor = "red";
+            }
+
+            
+            Array.from(answerButtons.children).forEach(btn => btn.disabled = true);
+
+            nextButton.classList.remove("hide");
+        }
+
+        
+        nextButton.addEventListener("click", () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                endQuiz();
+            }
+        });
+
+        
+        function endQuiz() {
+            clearInterval(timer);
+            questionElement.innerText = "Quiz Completed!";
+            answerButtons.innerHTML = "";
+            nextButton.classList.add("hide");
+            resultElement.classList.remove("hide");
+            resultElement.innerText = "Your Score: " + score + " / " + questions.length;
+        }
+    </script>
+
+</body>
+</html>
