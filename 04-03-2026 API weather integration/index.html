@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Task</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+    <h2>🌤️ Weather Info</h2>
+
+    <input type="text" id="city" placeholder="Enter Indian City">
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div id="output"></div>
+</div>
+
+<script>
+    function getWeather() {
+
+    const city = document.getElementById("city").value;
+
+    if (city === "") {
+        alert("Please enter city name");
+        return;
+    }
+
+    const apiKey = "2b6a5c9de2fb3780eee354232be30e0e";
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&units=metric&appid=${apiKey}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.cod !== 200) {
+                document.getElementById("output").innerHTML =
+                    "<p>❌ City not found</p>";
+                return;
+            }
+
+            document.getElementById("output").innerHTML = `
+                <h3>${data.name}</h3>
+                <p>🌡️ Temp: ${data.main.temp} °C</p>
+                <p>☁️ Weather: ${data.weather[0].description}</p>
+                <p>💧 Humidity: ${data.main.humidity}%</p>
+                <p>💨 Wind: ${data.wind.speed} m/s</p>
+            `;
+        })
+        .catch(error => {
+            document.getElementById("output").innerHTML =
+                "<p>⚠️ Error fetching data</p>";
+        });
+}
+</script>
+</body>
+</html>
