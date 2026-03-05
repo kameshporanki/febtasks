@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Todo Planner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="main-container">
+
+    
+    <div class="wrapper">
+    <h2>My To-Do List</h2>
+    <div id="clock"></div>
+
+        <div class="inputs">
+            <input type="text" id="taskText" placeholder="Enter task">
+            <input type="date" id="taskDate">
+
+            <select id="taskHour">
+                <option value="">Select Hour</option>
+            </select>
+
+            <button id="addBtn">Add Task</button>
+        </div>
+    </div>
+
+    <div class="task-container">
+        <h3>Your Tasks</h3>
+        <ul id="taskList"></ul>
+    </div>
+
+</div>
+
+<script>
+
+const taskText = document.getElementById("taskText")
+const taskDate = document.getElementById("taskDate")
+const taskHour = document.getElementById("taskHour")
+const taskList = document.getElementById("taskList")
+const addBtn = document.getElementById("addBtn")
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || []
+
+
+for(let i = 0; i < 24; i++){
+let opt = document.createElement("option")
+opt.value = i
+opt.textContent = i + ":00"
+taskHour.appendChild(opt)
+}
+
+
+function showClock(){
+let now = new Date()
+document.getElementById("clock").textContent = now.toLocaleString()
+}
+
+setInterval(showClock,1000)
+showClock()
+
+function save(){
+localStorage.setItem("tasks", JSON.stringify(tasks))
+}
+
+
+function displayTasks(){
+
+taskList.innerHTML = ""
+
+tasks.forEach((t,index)=>{
+
+let li = document.createElement("li")
+
+let info = document.createElement("div")
+
+let title = document.createElement("div")
+title.textContent = t.text
+title.className = "task-title"
+
+if(t.completed){
+title.classList.add("done")
+}
+
+title.onclick = function(){
+t.completed = !t.completed
+save()
+displayTasks()
+}
+
+let time = document.createElement("div")
+time.className = "task-time"
+time.textContent = t.date + " - " + t.hour + ":00"
+
+info.appendChild(title)
+info.appendChild(time)
+
+let del = document.createElement("button")
+del.textContent = "X"
+del.className = "delete-btn"
+
+del.onclick = function(){
+tasks.splice(index,1)
+save()
+displayTasks()
+}
+
+li.appendChild(info)
+li.appendChild(del)
+
+taskList.appendChild(li)
+})
+}
+
+addBtn.onclick = function(){
+
+let text = taskText.value
+let date = taskDate.value
+let hour = taskHour.value
+
+if(text === "" || date === "" || hour === ""){
+alert("Please fill all fields")
+return
+}
+
+tasks.push({
+text:text,
+date:date,
+hour:hour,
+completed:false
+})
+
+save()
+displayTasks()
+
+taskText.value = ""
+}
+
+displayTasks()
+</script>
+</body>
+</html>
