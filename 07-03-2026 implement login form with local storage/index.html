@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Login System</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="container">
+
+<div id="registerForm">
+<h2>REGISTER</h2>
+
+<input type="text" id="regUsername" placeholder="Enter Username">
+<input type="email" id="regEmail" placeholder="Enter Email">
+<input type="tel" id="regPhone" placeholder="Enter Phone Number">
+<input type="password" id="regPassword" placeholder="Enter Password">
+<input type="password" id="regConfirmPassword" placeholder="Re-Enter Password">
+
+<button onclick="registerUser()">Register</button>
+
+<p id="regMsg"></p>
+
+<p>Already have account? 
+<a href="#" onclick="showLogin()">Login</a>
+</p>
+
+</div>
+
+
+<div id="loginForm" style="display:none;">
+<h2>Login</h2>
+
+
+<input type="text" id="loginUsername" placeholder="Enter Username">
+<input type="password" id="loginPassword" placeholder="Enter Password">
+
+<button onclick="loginUser()">Login</button>
+
+<p id="loginMsg"></p>
+
+<p>Don't have account? 
+<a href="#" onclick="showRegister()">Register</a>
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+function showLogin(){
+document.getElementById("registerForm").style.display="none";
+document.getElementById("loginForm").style.display="block";
+}
+
+function showRegister(){
+document.getElementById("loginForm").style.display="none";
+document.getElementById("registerForm").style.display="block";
+}
+
+
+function registerUser(){
+
+let username = document.getElementById("regUsername").value;
+let email = document.getElementById("regEmail").value;
+let phone = document.getElementById("regPhone").value;
+let password = document.getElementById("regPassword").value;
+let confirmPassword = document.getElementById("regConfirmPassword").value;
+
+if(username === "" || email === "" || phone === "" || password === ""){
+alert("Please fill all fields");
+return;
+}
+
+if(password !== confirmPassword){
+alert("Passwords do not match");
+return;
+}
+
+localStorage.setItem("username", username);
+localStorage.setItem("email", email);
+localStorage.setItem("phone", phone);
+localStorage.setItem("password", password);
+
+alert("Registered Successfully! Please login.");
+
+document.getElementById("registerForm").style.display = "none";
+document.getElementById("loginForm").style.display = "block";
+
+}
+
+function loginUser(){
+
+let username = document.getElementById("loginUsername").value;
+let password = document.getElementById("loginPassword").value;
+
+let storedUsername = localStorage.getItem("username");
+ let storedPassword = localStorage.getItem("password");
+let storedEmail = localStorage.getItem("email");
+let storedPhone = localStorage.getItem("phone");
+
+if(username === storedUsername && password === storedPassword){
+
+document.getElementById("loginForm").style.display = "none";
+const container = document.querySelector(".container");
+
+container.innerHTML = `
+<h2>Welcome to our site, ${storedUsername}!</h2>
+<p>Email: ${storedEmail}</p>
+<p>Phone: ${storedPhone}</p>
+
+<button onclick="logoutUser()">Logout</button>
+`;
+
+}
+else{
+document.getElementById("loginMsg").innerText = "Invalid Login Details";
+}
+
+}
+
+function logoutUser(){
+
+document.querySelector(".container").innerHTML = `
+<div id="registerForm" style="display:none;">
+<h2>REGISTER</h2>
+
+<input type="text" id="regUsername" placeholder="Enter Username">
+<input type="email" id="regEmail" placeholder="Enter Email">
+<input type="tel" id="regPhone" placeholder="Enter Phone Number">
+<input type="password" id="regPassword" placeholder="Enter Password">
+<input type="password" id="regConfirmPassword" placeholder="Re-Enter Password">
+
+<button onclick="registerUser()">Register</button>
+
+<p id="regMsg"></p>
+
+<p>Already have account? 
+<a href="#" onclick="showLogin()">Login</a>
+</p>
+
+</div>
+
+
+<div id="loginForm">
+<h2>Login</h2>
+
+<input type="text" id="loginUsername" placeholder="Enter Username">
+<input type="password" id="loginPassword" placeholder="Enter Password">
+
+<button onclick="loginUser()">Login</button>
+
+<p id="loginMsg"></p>
+
+<p>Don't have account? 
+<a href="#" onclick="showRegister()">Register</a>
+</p>
+
+</div>
+
+`;
+
+}
+
+</script>
+
+</body>
+</html>
